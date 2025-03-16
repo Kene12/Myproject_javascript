@@ -1,18 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-mongoose('dotenv').config();
+const MONGO_URI = "mongodb+srv://kene123e:kene54321e@cluster0.5tt40.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedToplogy: true,
-}).then(() => console.log("DB connected")).catch(err => console.log(err));
+    useUnifiedTopology: true,
+  }).then(() => {
+    console.log('MongoDB Connected');
+  }).catch(err => {
+    console.error('MongoDB connection error:', err);
+  });
 
-app.use('/auth', require('./routers/authRoutes'));
+app.use('/auth', require('./routes/authRoutes'));
 
-const PORT = process.env.PORT || 500;
-app.listen(PORT, () => console.log('Server running on port ${PORT}'));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
