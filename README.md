@@ -25,7 +25,7 @@ This project is a web application built using Node.js, Express, and MongoDB. It 
    npm install
    ```
 
-3. Create a `.env` file in the root directory and add the following environment variables:
+3. Install package nodejs:
    ```env
    npm install express mongoose bcryptjs jsonwebtoken cors dotenv
    ```
