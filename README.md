@@ -1,6 +1,6 @@
 npm install express mongoose bcryptjs jsonwebtoken cors dotenv
 
-{
+{/n
   "username": "exampleUser",
   "email": "user@example.com",
   "password": "password123"
