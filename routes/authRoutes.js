@@ -1,18 +1,18 @@
 const jwt = require("jsonwebtoken");
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+const acc = require('../models/Account');
 
 const router = express.Router();
 
-router.post('/register', async (req, res) =>{
+router.post('/registerUser', async (req, res) =>{
     try{
         const { username, email, password } =req.body;
-
+        const typeUser = "User";
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({username, email, password: hashedPassword});
+        const newUser = new acc({username, email, password: hashedPassword, type: typeUser});
         await newUser.save();
 
         res.json({ message: "User registered successfully!"});
@@ -21,10 +21,26 @@ router.post('/register', async (req, res) =>{
     }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/registerAdmin', async (req, res) =>{
+  try{
+      const { username, email, password } =req.body;
+      const typeUser = "Admin";
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const newUser = new acc({username, email, password: hashedPassword, type: typeUser});
+      await newUser.save();
+
+      res.json({ message: "Admin registered successfully!"});
+  } catch(err){
+      res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({ email });
+      const user = await acc.findOne({ email });
   
       if (!user) return res.status(400).json({ error: "User not found" });
   
