@@ -12,7 +12,7 @@ router.post('/registerUser', async (req, res) =>{
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new acc({username, email, password: hashedPassword, type: typeUser});
+        const newUser = new acc({username, email, password: hashedPassword, role: typeUser});
         await newUser.save();
 
         res.json({ message: "User registered successfully!"});
@@ -28,7 +28,7 @@ router.post('/registerAdmin', async (req, res) =>{
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
-      const newUser = new acc({username, email, password: hashedPassword, type: typeUser});
+      const newUser = new acc({username, email, password: hashedPassword, role: typeUser});
       await newUser.save();
 
       res.json({ message: "Admin registered successfully!"});
@@ -52,6 +52,6 @@ router.get('/login', async (req, res) => {
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
-  });
+});
 
 module.exports = router;
