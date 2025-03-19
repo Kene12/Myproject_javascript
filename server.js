@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const MONGO_URI = "mongodb+srv://kene123e:kene54321e@cluster0.5tt40.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
