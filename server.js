@@ -6,6 +6,13 @@ const MONGO_URI = "mongodb+srv://kene123e:kene54321e@cluster0.5tt40.mongodb.net/
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,

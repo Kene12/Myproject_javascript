@@ -37,7 +37,7 @@ router.post('/registerAdmin', async (req, res) =>{
   }
 });
 
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
       const user = await acc.findOne({ email });
@@ -47,8 +47,15 @@ router.get('/login', async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
   
-      const token = jwt.sign({ id: user._id }, "SECRET_KEY", { expiresIn: "1h" });
-      res.json({ token, user });
+      const token = jwt.sign({ id: user._id }, "SECRET_KEY", { expiresIn: "3h" });
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 60 * 60 * 1000,
+      });
+  
+      res.json({ message: "Login successful!" });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
