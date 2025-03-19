@@ -61,4 +61,21 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.json({ message: "Logged out successfully" });
+});
+
+router.get("/my", (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: "Not authenticated" });
+
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ userId: verified.id });
+  } catch (err) {
+    res.status(401).json({ error: "Invalid token" });
+  }
+});
+
 module.exports = router;
