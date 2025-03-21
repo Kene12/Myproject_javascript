@@ -1,12 +1,33 @@
 const express = require('express');
+const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const acc = require('../models/Account');
+const secrets = require('../config/secrets.json');
 
 const router = express.Router();
 
+const isAdmin = async (req, res, next) => {
+  try {
+      const token = req.cookies.token;
+      if (!token) return res.status(401).json({ error: "Not authenticated" });
+
+      const verified = jwt.verify(token, secrets.JWT_SECRET);
+      const adminUser = await acc.findById(verified.id);
+      
+      if (!adminUser || adminUser.role !== "Admin") {
+          return res.status(403).json({ error: "Access denied. Admins only." });
+      }
+      
+      req.adminUser = adminUser;
+      next(); 
+  } catch (err) {
+      res.status(401).json({ error: "Invalid token" });
+  }
+};
+
 router.get('/Search', async (req, res) => {
   try {
-    const { _id, username, email } = req.body;
+    const { _id, username, email } = req.query;
     let query = {};
     if (_id) query._id = _id;
     if (username) query.username = username;
@@ -29,11 +50,10 @@ router.get('/showUser', async (req, res) =>{
   }
 });
 
-router.patch('/editUser', async (req, res) =>{
+router.patch('/editUser', isAdmin, async (req, res) =>{
   try{
-    const { _id, username, email, password, role} = req.body;
+    const { _id, username, email, password} = req.body;
 
-    if (role != "Admin") return res.status(400).json({ error: "The role has no permission" });
     if (!_id) return res.status(400).json({ error: "Id not found" });
 
     const salt = await bcrypt.genSalt(10);
@@ -41,7 +61,7 @@ router.patch('/editUser', async (req, res) =>{
     let updateData = {};
     if (username) updateData.username = username;
     if (email) updateData.email = email;
-    if (password) updateData.password = hashedPassword
+    if (password) updateData.password = hashedPassword;
 
     const updateUser = await acc.findByIdAndUpdate(_id, updateData, { new: true});
 
@@ -53,10 +73,9 @@ router.patch('/editUser', async (req, res) =>{
   }
 });
 
-router.delete('/deleteUser', async( req, res) =>{
+router.delete('/deleteUser', isAdmin, async( req, res) =>{
   try{
-    const {_id, role} = req.body;
-    if (role != "Admin") return res.status(400).json({ error: "The role has no permission" });
+    const {_id} = req.body;
     if (!_id) return res.status(400).json({ error: "Id not found" });
 
     const userToDelete = await acc.findOne({ _id });

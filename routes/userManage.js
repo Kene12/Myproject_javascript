@@ -2,13 +2,17 @@ const jwt = require("jsonwebtoken");
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const acc = require('../models/Account');
+const secrets = require('../config/secrets.json');
 
 const router = express.Router();
 
 router.patch('/edit', async (req, res) => {
   try {
-    const { _id, username, email} = req.body;
-
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ error: "Not authenticated" });
+    const { username, email} = req.body;
+    const verified = jwt.verify(token, secrets.JWT_SECRET);
+    const _id = verified.id;
     if (!_id) return res.status(400).json({ error: "Id not found" });
 
     const user = await acc.findById(_id);
