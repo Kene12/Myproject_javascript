@@ -27,7 +27,7 @@ This project is a web application built using Node.js, Express, and MongoDB. It 
 
 3. Install package nodejs:
    ```env
-   npm install express mongoose bcryptjs jsonwebtoken cors dotenv
+   npm install express mongoose bcryptjs jsonwebtoken cors dotenv cookie-parser
    ```
 
 4. Start the server:
