@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const acc = require('../models/Account');
+const secrets = require('../config/secrets.json');
 
 const router = express.Router();
 
@@ -47,14 +48,13 @@ router.post('/login', async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
   
-      const token = jwt.sign({ id: user._id }, "SECRET_KEY", { expiresIn: "3h" });
+      const token = jwt.sign({ id: user._id }, secrets.JWT_SECRET, { expiresIn: "3h" });
       res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: secrets.NODE_ENV === "production",
         sameSite: "Strict",
         maxAge: 60 * 60 * 1000,
       });
-  
       res.json({ message: "Login successful!" });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -71,7 +71,7 @@ router.get("/my", (req, res) => {
   if (!token) return res.status(401).json({ error: "Not authenticated" });
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    const verified = jwt.verify(token, secrets.JWT_SECRET);
     res.json({ userId: verified.id });
   } catch (err) {
     res.status(401).json({ error: "Invalid token" });
